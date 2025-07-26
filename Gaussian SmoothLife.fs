@@ -24,11 +24,6 @@
         }
     ],
     "ISFVSN": "2",
-	"IMPORTED": {
-		"noiseTex": {
-			"PATH": "pebbles.png"
-		}
-	},
     "PASSES": [
         {
             "TARGET": "bufferA",
