@@ -155,9 +155,9 @@ void main()
         }
 
         float initialCellCount = min(iResolution.x, iResolution.y) / 50.;
-        if(iFrame < initialCellCount || reset()) {
-            float angle = 8. * atan(1) * // 2 pi
-                          iFrame / initialCellCount;
+        if(float(iFrame) < initialCellCount || reset()) {
+            float angle = 6.2831853072 * // 2 pi
+                          float(iFrame) / initialCellCount;
            	vec2 initialCoordinate = 0.25 * vec2(cos(angle), sin(angle)) + 0.5;
             float dst = length(fragCoord.xy - initialCoordinate * RENDERSIZE);
             if(dst <= or) {
