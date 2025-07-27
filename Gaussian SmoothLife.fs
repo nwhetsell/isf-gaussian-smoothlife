@@ -177,11 +177,11 @@ vec2 gaussian(float i, vec2 a, vec2 d) {
 
 void main()
 {
+    vec2 tx = 1. / iResolution.xy;
+    vec2 uv = fragCoord.xy * tx;
+
     if (PASSINDEX == 0) // ShaderToy Buffer A
     {
-        vec2 tx = 1. / iResolution.xy;
-        vec2 uv = fragCoord.xy * tx;
-
         vec4 current = IMG_NORM_PIXEL(bufferA, uv);
         vec2 fullness = IMG_NORM_PIXEL(bufferC, uv).xy;
 
@@ -216,8 +216,6 @@ void main()
     }
     else if (PASSINDEX == 1) // ShaderToy Buffer B
     {
-        vec2 tx = 1. / iResolution.xy;
-        vec2 uv = fragCoord.xy * tx;
         tx = (mod(float(iFrame),2.) < 1.) ? vec2(tx.x,0.) : vec2(0.,tx.y);
 
         vec2 sigma = vec2(or, ir);
@@ -246,8 +244,6 @@ void main()
     }
     else if (PASSINDEX == 2) // ShaderToy Buffer C
     {
-        vec2 tx = 1. / iResolution.xy;
-        vec2 uv = fragCoord.xy * tx;
         tx = (mod(float(iFrame),2.) < 1.) ? vec2(0.,tx.y) : vec2(tx.x,0.);
 
         vec2 sigma = vec2(or, ir);
@@ -276,7 +272,6 @@ void main()
     }
     else if (PASSINDEX == 3) // ShaderToy Image
     {
-        vec2 uv = fragCoord.xy / iResolution.xy;
     	vec4 col = IMG_NORM_PIXEL(bufferA, uv);
 
         fragColor = vec4(col.x * vec3(1.) + col.y * vec3(1., 0.5, 0.) + col.z * vec3(0., 0.5, 1.), 1.);
