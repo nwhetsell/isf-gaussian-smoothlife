@@ -185,16 +185,11 @@ vec2 GaussianSummation_computeGaussian(GaussianSummation gaussianSummation, floa
     return gaussianSummation.a * exp(-i * i / gaussianSummation.d);
 }
 
-#define fragColor gl_FragColor
-#define fragCoord gl_FragCoord
-#define iFrame FRAMEINDEX
-#define iResolution RENDERSIZE
-
 
 void addCell(inout float new, vec2 nomralizedCoordinate)
 {
     // from chronos' SmoothLife shader https://www.shadertoy.com/view/XtdSDn
-    float dst = length(fragCoord.xy - nomralizedCoordinate * RENDERSIZE);
+    float dst = length(gl_FragCoord.xy - nomralizedCoordinate * RENDERSIZE);
     if (dst <= or) {
     	new = step((ir + 1.5), dst) * (1. - step(or, dst));
     }
@@ -202,8 +197,8 @@ void addCell(inout float new, vec2 nomralizedCoordinate)
 
 void main()
 {
-    vec2 tx = 1. / iResolution.xy;
-    vec2 uv = fragCoord.xy * tx;
+    vec2 tx = 1. / RENDERSIZE;
+    vec2 uv = gl_FragCoord.xy * tx;
 
     if (PASSINDEX == 0) // ShaderToy Buffer A
     {
@@ -217,11 +212,11 @@ void main()
             addCell(new, mouse.xy);
         }
 
-        // For unclear reasons, iFrame must be strictly less than 2, not 1,
+        // For unclear reasons, FRAMEINDEX must be strictly less than 2, not 1,
         // here.
-        if (iFrame < 2 || addCells) {
+        if (FRAMEINDEX < 2 || addCells) {
 #ifdef VIDEOSYNC
-            float initialCellCount = min(iResolution.x, iResolution.y) / 50.;
+            float initialCellCount = min(RENDERSIZE.x, RENDERSIZE.y) / 50.;
 #else
             const float initialCellCount = 20.;
 #endif
@@ -233,11 +228,11 @@ void main()
             }
         }
 
-        fragColor = vec4(new, fullness, current.w);
+        gl_FragColor = vec4(new, fullness, current.w);
     }
     else if (PASSINDEX == 1) // ShaderToy Buffer B
     {
-        if (mod(iFrame, 2) < 1) {
+        if (mod(FRAMEINDEX, 2) < 1) {
             tx.y = 0.;
         } else {
             tx.x = 0.;
@@ -268,11 +263,11 @@ void main()
 
         vec2 x_pass = gaussianSummation.acc / gaussianSummation.sum;
 
-        fragColor = vec4(x_pass, 0., 0.);
+        gl_FragColor = vec4(x_pass, 0., 0.);
     }
     else if (PASSINDEX == 2) // ShaderToy Buffer C
     {
-        if (mod(iFrame, 2) < 1) {
+        if (mod(FRAMEINDEX, 2) < 1) {
             tx.x = 0.;
         } else {
             tx.y = 0.;
@@ -296,12 +291,12 @@ void main()
 
         vec2 y_pass = gaussianSummation.acc / gaussianSummation.sum;
 
-        fragColor = vec4(y_pass, 0., 0.);
+        gl_FragColor = vec4(y_pass, 0., 0.);
     }
     else if (PASSINDEX == 3) // ShaderToy Image
     {
     	vec4 col = IMG_NORM_PIXEL(bufferA, uv);
 
-        fragColor = vec4(col.x * vec3(1.) + col.y * vec3(1., 0.5, 0.) + col.z * vec3(0., 0.5, 1.), 1.);
+        gl_FragColor = vec4(col.x * vec3(1.) + col.y * vec3(1., 0.5, 0.) + col.z * vec3(0., 0.5, 1.), 1.);
     }
 }
