@@ -154,14 +154,20 @@ void main()
             }
         }
 
-        float initialCellCount = min(iResolution.x, iResolution.y) / 50.;
-        if(float(iFrame) < initialCellCount || reset()) {
-            float angle = 6.2831853072 * // 2 pi
-                          float(iFrame) / initialCellCount;
-           	vec2 initialCoordinate = 0.25 * vec2(cos(angle), sin(angle)) + 0.5;
-            float dst = length(fragCoord.xy - initialCoordinate * RENDERSIZE);
-            if(dst <= or) {
-            	new = step((ir+1.5), dst) * (1.0 - step(or, dst));
+        if(iFrame < 2 || reset()) {
+#ifdef VIDEOSYNC
+            float initialCellCount = min(iResolution.x, iResolution.y) / 50.;
+#else
+            const float initialCellCount = 20.;
+#endif
+            for (float i = 0.; i < initialCellCount; i++) {
+                float angle = 6.2831853072 * // 2 pi
+                              i / initialCellCount;
+               	vec2 initialCoordinate = 0.25 * vec2(cos(angle), sin(angle)) + 0.5;
+                float dst = length(fragCoord.xy - initialCoordinate * RENDERSIZE);
+                if(dst <= or) {
+                   	new = step((ir+1.5), dst) * (1.0 - step(or, dst));
+                }
             }
         }
         fragColor = vec4(new, fullness, current.w);
