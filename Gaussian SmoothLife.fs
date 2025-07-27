@@ -12,6 +12,7 @@
         },
         {
             "NAME": "addCells",
+            "LABEL": "Add cells (drag mouse)",
             "TYPE": "bool",
             "DEFAULT": false
         },
