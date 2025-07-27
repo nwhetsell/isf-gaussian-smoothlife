@@ -232,7 +232,7 @@ void main()
     }
     else if (PASSINDEX == 1) // ShaderToy Buffer B
     {
-        if (mod(FRAMEINDEX, 2) < 1) {
+        if (mod(float(FRAMEINDEX), 2.) < 1.) {
             tx.y = 0.;
         } else {
             tx.x = 0.;
@@ -267,7 +267,7 @@ void main()
     }
     else if (PASSINDEX == 2) // ShaderToy Buffer C
     {
-        if (mod(FRAMEINDEX, 2) < 1) {
+        if (mod(float(FRAMEINDEX), 2.) < 1.) {
             tx.x = 0.;
         } else {
             tx.y = 0.;
