@@ -125,32 +125,32 @@
 //
 
 // the logistic function is used as a smooth step function
-float sigma1(float x,float a,float alpha)
+float sigma1(float x, float a, float alpha)
 {
-    return 1.0 / ( 1.0 + exp( -(x-a)*4.0/alpha ) );
+    return 1. / (1. + exp(-(x-a) * 4. / alpha));
 }
 
-float sigma2(float x,float a,float b,float alpha)
+float sigma2(float x, float a, float b, float alpha)
 {
-    return sigma1(x,a,alpha)
-        * ( 1.0-sigma1(x,b,alpha) );
+    return sigma1(x, a, alpha) * (1. - sigma1(x, b, alpha));
 }
 
-float sigma_m(float x,float y,float m,float alpha)
+float sigma_m(float x, float y, float m, float alpha)
 {
-    return x * ( 1.0-sigma1(m,0.5,alpha) )
-        + y * sigma1(m,0.5,alpha);
+    return x * (1. - sigma1(m, 0.5, alpha)) + y * sigma1(m, 0.5, alpha);
 }
 
 // the transition function
 // (n = outer fullness, m = inner fullness)
-float s(float n,float m)
+float s(float n, float m)
 {
-    return sigma2( n, sigma_m(b1,s1,m,alpha_m),
-        sigma_m(b2,s2,m,alpha_m), alpha_n );
+    return sigma2(
+        n,
+        sigma_m(b1, s1, m, alpha_m),
+        sigma_m(b2, s2, m, alpha_m),
+        alpha_n
+    );
 }
-
-#define T(d) texture(bufferA, fract(uv+d)).x
 
 
 //
@@ -164,8 +164,9 @@ const int   oc = 50;           // sample cutoff
 // ---------------------------------------------
 
 
-vec2 gaussian(float i, vec2 a, vec2 d) {
-     return a * exp( -(i*i) / d );
+vec2 gaussian(float i, vec2 a, vec2 d)
+{
+     return a * exp(-i * i / d);
 }
 
 
@@ -185,18 +186,18 @@ void main()
         vec4 current = IMG_NORM_PIXEL(bufferA, uv);
         vec2 fullness = IMG_NORM_PIXEL(bufferC, uv).xy;
 
-        float delta =  2. * s( fullness.x, fullness.y ) - 1.;
-        float new = clamp( current.x + dt * delta, 0., 1. );
+        float delta =  2. * s(fullness.x, fullness.y) - 1.;
+        float new = clamp(current.x + dt * delta, 0., 1.);
 
-        if(addCellsWithMouse) {
+        if (addCellsWithMouse) {
             // from chronos' SmoothLife shader https://www.shadertoy.com/view/XtdSDn
             float dst = length(fragCoord.xy - mouse.xy * RENDERSIZE);
-            if(dst <= or) {
-            	new = step((ir+1.5), dst) * (1. - step(or, dst));
+            if (dst <= or) {
+            	new = step((ir + 1.5), dst) * (1. - step(or, dst));
             }
         }
 
-        if(iFrame < 2 || addCells) {
+        if (iFrame < 2 || addCells) {
 #ifdef VIDEOSYNC
             float initialCellCount = min(iResolution.x, iResolution.y) / 50.;
 #else
@@ -207,16 +208,17 @@ void main()
                               i / initialCellCount;
                	vec2 initialCoordinate = 0.25 * vec2(cos(angle), sin(angle)) + 0.5;
                 float dst = length(fragCoord.xy - initialCoordinate * RENDERSIZE);
-                if(dst <= or) {
-                   	new = step((ir+1.5), dst) * (1. - step(or, dst));
+                if (dst <= or) {
+                   	new = step((ir + 1.5), dst) * (1. - step(or, dst));
                 }
             }
         }
+
         fragColor = vec4(new, fullness, current.w);
     }
     else if (PASSINDEX == 1) // ShaderToy Buffer B
     {
-        tx = (mod(float(iFrame),2.) < 1.) ? vec2(tx.x,0.) : vec2(0.,tx.y);
+        tx = (mod(float(iFrame), 2.) < 1.) ? vec2(tx.x, 0.) : vec2(0., tx.y);
 
         vec2 sigma = vec2(or, ir);
         vec2 a = vec2(1. / (sigma * SQRT_2_PI));
@@ -240,11 +242,11 @@ void main()
 
         vec2 x_pass = acc / sum;
 
-        fragColor = vec4(x_pass,0,0);
+        fragColor = vec4(x_pass, 0., 0.);
     }
     else if (PASSINDEX == 2) // ShaderToy Buffer C
     {
-        tx = (mod(float(iFrame),2.) < 1.) ? vec2(0.,tx.y) : vec2(tx.x,0.);
+        tx = (mod(float(iFrame), 2.) < 1.) ? vec2(0., tx.y) : vec2(tx.x, 0.);
 
         vec2 sigma = vec2(or, ir);
         vec2 a = vec2(1. / (sigma * SQRT_2_PI));
@@ -268,7 +270,7 @@ void main()
 
         vec2 y_pass = acc / sum;
 
-        fragColor = vec4(y_pass,0,0);
+        fragColor = vec4(y_pass, 0., 0.);
     }
     else if (PASSINDEX == 3) // ShaderToy Image
     {
