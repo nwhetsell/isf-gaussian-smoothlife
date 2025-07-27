@@ -7,7 +7,8 @@ This particular shader is converted from
 [this ShaderToy shader](https://www.shadertoy.com/view/XtVXzV). The above
 screenshot is from [Videosync](https://videosync.showsync.com).
 
-This shader is
+> [!NOTE]
+> This shader is
 [available on the ISF website](https://editor.isf.video/shaders/6885276e2f6812001a55f70b)
 for the sake of completeness, but there appears to be a bug in the ISF website
 that prevents this shader from rendering correctly. Both Videosync and the
