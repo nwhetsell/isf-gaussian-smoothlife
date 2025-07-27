@@ -160,8 +160,6 @@ float s(float n,float m)
 #define SQRT_2_PI 2.50662827463
 
 // ---------------------------------------------
-// const float or = 18.0;         // outer gaussian std dev
-// const float ir = 6.0;          // inner gaussian std dev
 const int   oc = 50;           // sample cutoff
 // ---------------------------------------------
 
@@ -181,20 +179,20 @@ void main()
 {
     if (PASSINDEX == 0) // ShaderToy Buffer A
     {
-        vec2 tx = 1.0 / iResolution.xy;
+        vec2 tx = 1. / iResolution.xy;
         vec2 uv = fragCoord.xy * tx;
 
         vec4 current = IMG_NORM_PIXEL(bufferA, uv);
         vec2 fullness = IMG_NORM_PIXEL(bufferC, uv).xy;
 
-        float delta =  2.0 * s( fullness.x, fullness.y ) - 1.0;
-        float new = clamp( current.x + dt * delta, 0.0, 1.0 );
+        float delta =  2. * s( fullness.x, fullness.y ) - 1.;
+        float new = clamp( current.x + dt * delta, 0., 1. );
 
         if(addCellsWithMouse) {
             // from chronos' SmoothLife shader https://www.shadertoy.com/view/XtdSDn
             float dst = length(fragCoord.xy - mouse.xy * RENDERSIZE);
             if(dst <= or) {
-            	new = step((ir+1.5), dst) * (1.0 - step(or, dst));
+            	new = step((ir+1.5), dst) * (1. - step(or, dst));
             }
         }
 
@@ -210,7 +208,7 @@ void main()
                	vec2 initialCoordinate = 0.25 * vec2(cos(angle), sin(angle)) + 0.5;
                 float dst = length(fragCoord.xy - initialCoordinate * RENDERSIZE);
                 if(dst <= or) {
-                   	new = step((ir+1.5), dst) * (1.0 - step(or, dst));
+                   	new = step((ir+1.5), dst) * (1. - step(or, dst));
                 }
             }
         }
@@ -218,15 +216,15 @@ void main()
     }
     else if (PASSINDEX == 1) // ShaderToy Buffer B
     {
-        vec2 tx = 1.0 / iResolution.xy;
+        vec2 tx = 1. / iResolution.xy;
         vec2 uv = fragCoord.xy * tx;
-        tx = (mod(float(iFrame),2.0) < 1.0) ? vec2(tx.x,0) : vec2(0,tx.y);
+        tx = (mod(float(iFrame),2.) < 1.) ? vec2(tx.x,0.) : vec2(0.,tx.y);
 
         vec2 sigma = vec2(or, ir);
-        vec2 a = vec2(1.0 / (sigma * SQRT_2_PI));
-        vec2 d = vec2(2.0 * sigma * sigma);
-        vec2 acc = vec2(0.0);
-        vec2 sum = vec2(0.0);
+        vec2 a = vec2(1. / (sigma * SQRT_2_PI));
+        vec2 d = vec2(2. * sigma * sigma);
+        vec2 acc = vec2(0.);
+        vec2 sum = vec2(0.);
 
         // centermost term
         acc += a * IMG_NORM_PIXEL(bufferA, uv).x;
@@ -239,7 +237,7 @@ void main()
             vec2 posL = fract(uv - tx * fi);
             vec2 posR = fract(uv + tx * fi);
             acc += g * (IMG_NORM_PIXEL(bufferA, posL).x + IMG_NORM_PIXEL(bufferA, posR).x);
-            sum += 2.0 * g;
+            sum += 2. * g;
         }
 
         vec2 x_pass = acc / sum;
@@ -248,15 +246,15 @@ void main()
     }
     else if (PASSINDEX == 2) // ShaderToy Buffer C
     {
-        vec2 tx = 1.0 / iResolution.xy;
+        vec2 tx = 1. / iResolution.xy;
         vec2 uv = fragCoord.xy * tx;
-        tx = (mod(float(iFrame),2.0) < 1.0) ? vec2(0,tx.y) : vec2(tx.x,0);
+        tx = (mod(float(iFrame),2.) < 1.) ? vec2(0.,tx.y) : vec2(tx.x,0.);
 
         vec2 sigma = vec2(or, ir);
-        vec2 a = vec2(1.0 / (sigma * SQRT_2_PI));
-        vec2 d = vec2(2.0 * sigma * sigma);
-        vec2 acc = vec2(0.0);
-        vec2 sum = vec2(0.0);
+        vec2 a = vec2(1. / (sigma * SQRT_2_PI));
+        vec2 d = vec2(2. * sigma * sigma);
+        vec2 acc = vec2(0.);
+        vec2 sum = vec2(0.);
 
         // centermost term
         acc += a * IMG_NORM_PIXEL(bufferB, uv).x;
@@ -269,7 +267,7 @@ void main()
             vec2 posL = fract(uv - tx * fi);
             vec2 posR = fract(uv + tx * fi);
             acc += g * (IMG_NORM_PIXEL(bufferB, posL).xy + IMG_NORM_PIXEL(bufferB, posR).xy);
-            sum += 2.0 * g;
+            sum += 2. * g;
         }
 
         vec2 y_pass = acc / sum;
