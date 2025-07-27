@@ -6,13 +6,13 @@
     "DESCRIPTION": "Variant of Stephan Rafler’s SmoothLife that uses a separable Gaussian kernel to compute inner and outer fullness, converted from <https://www.shadertoy.com/view/XtVXzV>",
     "INPUTS": [
         {
-            "NAME": "restart",
-            "LABEL": "Restart",
+            "NAME": "addCells",
+            "LABEL": "Add cells",
             "TYPE": "event"
         },
         {
-            "NAME": "addCells",
-            "LABEL": "Add cells (drag mouse)",
+            "NAME": "addCellsWithMouse",
+            "LABEL": "Add cells with mouse",
             "TYPE": "bool",
             "DEFAULT": false
         },
@@ -124,10 +124,6 @@
 // ShaderToy Buffer A
 //
 
-bool reset() {
-    return restart;
-}
-
 // the logistic function is used as a smooth step function
 float sigma1(float x,float a,float alpha)
 {
@@ -207,7 +203,7 @@ void main()
         float delta =  2.0 * s( fullness.x, fullness.y ) - 1.0;
         float new = clamp( current.x + dt * delta, 0.0, 1.0 );
 
-        if(addCells) {
+        if(addCellsWithMouse) {
             // from chronos' SmoothLife shader https://www.shadertoy.com/view/XtdSDn
             float dst = length(fragCoord.xy - mouse.xy * RENDERSIZE);
             if(dst <= or) {
@@ -215,7 +211,7 @@ void main()
             }
         }
 
-        if(iFrame < 2 || reset()) {
+        if(iFrame < 2 || addCells) {
 #ifdef VIDEOSYNC
             float initialCellCount = min(iResolution.x, iResolution.y) / 50.;
 #else
