@@ -22,6 +22,78 @@
             "DEFAULT": [0.5, 0.5],
             "MIN": [0, 0],
             "MAX": [1, 1]
+        },
+        {
+            "NAME": "or",
+            "LABEL": "Outer Gaussian std. dev.",
+            "TYPE": "float",
+            "DEFAULT": 18,
+            "MAX": 100,
+            "MIN": 0
+        },
+        {
+            "NAME": "ir",
+            "LABEL": "Inner Gaussian std. dev.",
+            "TYPE": "float",
+            "DEFAULT": 6,
+            "MAX": 100,
+            "MIN": 0
+        },
+        {
+            "NAME": "b1",
+            "LABEL": "Birth 1",
+            "TYPE": "float",
+            "DEFAULT": 0.19,
+            "MAX": 1,
+            "MIN": 0
+        },
+        {
+            "NAME": "b2",
+            "LABEL": "Birth 2",
+            "TYPE": "float",
+            "DEFAULT": 0.212,
+            "MAX": 1,
+            "MIN": 0
+        },
+        {
+            "NAME": "s1",
+            "LABEL": "Survival 1",
+            "TYPE": "float",
+            "DEFAULT": 0.267,
+            "MAX": 1,
+            "MIN": 0
+        },
+        {
+            "NAME": "s2",
+            "LABEL": "Survival 2",
+            "TYPE": "float",
+            "DEFAULT": 0.445,
+            "MAX": 1,
+            "MIN": 0
+        },
+        {
+            "NAME": "dt",
+            "LABEL": "Time step",
+            "TYPE": "float",
+            "DEFAULT": 0.2,
+            "MAX": 10,
+            "MIN": 0
+        },
+        {
+            "NAME": "alpha_n",
+            "LABEL": "Sigmoid width for outer fullness",
+            "TYPE": "float",
+            "DEFAULT": 0.017,
+            "MAX": 1,
+            "MIN": 0
+        },
+        {
+            "NAME": "alpha_m",
+            "LABEL": "Sigmoid width for inner fullness",
+            "TYPE": "float",
+            "DEFAULT": 0.112,
+            "MAX": 10,
+            "MIN": 0
         }
     ],
     "ISFVSN": "2",
@@ -51,18 +123,6 @@
 //
 // ShaderToy Buffer A
 //
-
-// ---------------------------------------------
-const float or = 18.0;         // outer gaussian std dev
-const float ir = 6.0;         // inner gaussian std dev
-const float b1 = 0.19;         // birth1
-const float b2 = 0.212;        // birth2
-const float s1 = 0.267;        // survival1
-const float s2 = 0.445;        // survival2
-const float dt = 0.2;          // timestep
-const float alpha_n = 0.017;   // sigmoid width for outer fullness
-const float alpha_m = 0.112;   // sigmoid width for inner fullness
-// ---------------------------------------------
 
 bool reset() {
     return restart;
