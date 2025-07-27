@@ -157,18 +157,33 @@ float s(float n, float m)
 // ShaderToy Buffer B
 //
 
-#define SQRT_2_PI 2.50662827463
-
 // ---------------------------------------------
 const int   oc = 50;           // sample cutoff
 // ---------------------------------------------
 
+struct GaussianSummation {
+    vec2 a;
+    vec2 d;
+    vec2 acc;
+    vec2 sum;
+};
 
-vec2 gaussian(float i, vec2 a, vec2 d)
+GaussianSummation GaussianSummation_create(float or, float ir)
 {
-     return a * exp(-i * i / d);
+    vec2 sigma = vec2(or, ir);
+
+    GaussianSummation gaussianSummation;
+    gaussianSummation.a = vec2(1. / (sigma * 2.50662827463)); // sqrt(2 * pi)
+    gaussianSummation.d = vec2(2. * sigma * sigma);
+    gaussianSummation.acc = vec2(0.);
+    gaussianSummation.sum = vec2(0.);
+    return gaussianSummation;
 }
 
+vec2 GaussianSummation_computeGaussian(GaussianSummation gaussianSummation, float i)
+{
+    return gaussianSummation.a * exp(-i * i / gaussianSummation.d);
+}
 
 #define fragColor gl_FragColor
 #define fragCoord gl_FragCoord
@@ -218,57 +233,64 @@ void main()
     }
     else if (PASSINDEX == 1) // ShaderToy Buffer B
     {
-        tx = (mod(float(iFrame), 2.) < 1.) ? vec2(tx.x, 0.) : vec2(0., tx.y);
+        if (mod(iFrame, 2) < 1) {
+            tx.y = 0.;
+        } else {
+            tx.x = 0.;
+        }
 
-        vec2 sigma = vec2(or, ir);
-        vec2 a = vec2(1. / (sigma * SQRT_2_PI));
-        vec2 d = vec2(2. * sigma * sigma);
-        vec2 acc = vec2(0.);
-        vec2 sum = vec2(0.);
+        GaussianSummation gaussianSummation = GaussianSummation_create(or, ir);
+
+        // Incredibly, GLSL has so many limitations that avoiding code
+        // duplication for the Gaussian summation seems to be impossible. The
+        // only things that vary between the two summations are the image name
+        // (bufferA vs. bufferB) and the component access in the for-loops
+        // (x vs. xy), but there doesn’t seem to be a way to encapsulate this in
+        // GLSL.
 
         // centermost term
-        acc += a * IMG_NORM_PIXEL(bufferA, uv).x;
-        sum += a;
+        gaussianSummation.acc += gaussianSummation.a * IMG_NORM_PIXEL(bufferA, uv).x;
+        gaussianSummation.sum += gaussianSummation.a;
 
         // sum up remaining terms symmetrically
         for (int i = 1; i <= oc; i++) {
             float fi = float(i);
-            vec2 g = gaussian(fi, a, d);
+            vec2 g = GaussianSummation_computeGaussian(gaussianSummation, float(i));
             vec2 posL = fract(uv - tx * fi);
             vec2 posR = fract(uv + tx * fi);
-            acc += g * (IMG_NORM_PIXEL(bufferA, posL).x + IMG_NORM_PIXEL(bufferA, posR).x);
-            sum += 2. * g;
+            gaussianSummation.acc += g * (IMG_NORM_PIXEL(bufferA, posL).x + IMG_NORM_PIXEL(bufferA, posR).x);
+            gaussianSummation.sum += 2. * g;
         }
 
-        vec2 x_pass = acc / sum;
+        vec2 x_pass = gaussianSummation.acc / gaussianSummation.sum;
 
         fragColor = vec4(x_pass, 0., 0.);
     }
     else if (PASSINDEX == 2) // ShaderToy Buffer C
     {
-        tx = (mod(float(iFrame), 2.) < 1.) ? vec2(0., tx.y) : vec2(tx.x, 0.);
+        if (mod(iFrame, 2) < 1) {
+            tx.x = 0.;
+        } else {
+            tx.y = 0.;
+        }
 
-        vec2 sigma = vec2(or, ir);
-        vec2 a = vec2(1. / (sigma * SQRT_2_PI));
-        vec2 d = vec2(2. * sigma * sigma);
-        vec2 acc = vec2(0.);
-        vec2 sum = vec2(0.);
+        GaussianSummation gaussianSummation = GaussianSummation_create(or, ir);
 
         // centermost term
-        acc += a * IMG_NORM_PIXEL(bufferB, uv).x;
-        sum += a;
+        gaussianSummation.acc += gaussianSummation.a * IMG_NORM_PIXEL(bufferB, uv).x;
+        gaussianSummation.sum += gaussianSummation.a;
 
         // sum up remaining terms symmetrically
         for (int i = 1; i <= oc; i++) {
             float fi = float(i);
-            vec2 g = gaussian(fi, a, d);
+            vec2 g = GaussianSummation_computeGaussian(gaussianSummation, float(i));
             vec2 posL = fract(uv - tx * fi);
             vec2 posR = fract(uv + tx * fi);
-            acc += g * (IMG_NORM_PIXEL(bufferB, posL).xy + IMG_NORM_PIXEL(bufferB, posR).xy);
-            sum += 2. * g;
+            gaussianSummation.acc += g * (IMG_NORM_PIXEL(bufferB, posL).xy + IMG_NORM_PIXEL(bufferB, posR).xy);
+            gaussianSummation.sum += 2. * g;
         }
 
-        vec2 y_pass = acc / sum;
+        vec2 y_pass = gaussianSummation.acc / gaussianSummation.sum;
 
         fragColor = vec4(y_pass, 0., 0.);
     }
