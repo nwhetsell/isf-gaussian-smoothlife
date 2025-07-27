@@ -241,7 +241,7 @@ void main()
 
         GaussianSummation gaussianSummation = GaussianSummation_create(or, ir);
 
-        // Incredibly, GLSL has so many limitations that avoiding code
+        // Incredibly, GLSL and ISF have so many limitations that avoiding code
         // duplication for the Gaussian summation seems to be impossible. The
         // only things that vary between the two summations are the image name
         // (bufferA vs. bufferB) and the component access in the for-loops
@@ -255,7 +255,7 @@ void main()
         // sum up remaining terms symmetrically
         for (int i = 1; i <= oc; i++) {
             float fi = float(i);
-            vec2 g = GaussianSummation_computeGaussian(gaussianSummation, float(i));
+            vec2 g = GaussianSummation_computeGaussian(gaussianSummation, fi);
             vec2 posL = fract(uv - tx * fi);
             vec2 posR = fract(uv + tx * fi);
             gaussianSummation.acc += g * (IMG_NORM_PIXEL(bufferA, posL).x + IMG_NORM_PIXEL(bufferA, posR).x);
@@ -283,7 +283,7 @@ void main()
         // sum up remaining terms symmetrically
         for (int i = 1; i <= oc; i++) {
             float fi = float(i);
-            vec2 g = GaussianSummation_computeGaussian(gaussianSummation, float(i));
+            vec2 g = GaussianSummation_computeGaussian(gaussianSummation, fi);
             vec2 posL = fract(uv - tx * fi);
             vec2 posR = fract(uv + tx * fi);
             gaussianSummation.acc += g * (IMG_NORM_PIXEL(bufferB, posL).xy + IMG_NORM_PIXEL(bufferB, posR).xy);
