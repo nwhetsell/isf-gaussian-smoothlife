@@ -237,6 +237,6 @@ void main()
         vec2 uv = fragCoord.xy / iResolution.xy;
     	vec4 col = IMG_NORM_PIXEL(bufferA, uv);
 
-        fragColor = col.x*vec4(1.0) + col.y*vec4(1,0.5,0,0) + col.z*vec4(0,0.5,1,0);
+        fragColor = vec4(col.x * vec3(1.) + col.y * vec3(1., 0.5, 0.) + col.z * vec3(0., 0.5, 1.), 1.);
     }
 }
