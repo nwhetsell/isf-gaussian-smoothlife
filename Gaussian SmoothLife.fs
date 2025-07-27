@@ -191,6 +191,15 @@ vec2 GaussianSummation_computeGaussian(GaussianSummation gaussianSummation, floa
 #define iResolution RENDERSIZE
 
 
+void addCell(inout float new, vec2 nomralizedCoordinate)
+{
+    // from chronos' SmoothLife shader https://www.shadertoy.com/view/XtdSDn
+    float dst = length(fragCoord.xy - nomralizedCoordinate * RENDERSIZE);
+    if (dst <= or) {
+    	new = step((ir + 1.5), dst) * (1. - step(or, dst));
+    }
+}
+
 void main()
 {
     vec2 tx = 1. / iResolution.xy;
@@ -205,13 +214,11 @@ void main()
         float new = clamp(current.x + dt * delta, 0., 1.);
 
         if (addCellsWithMouse) {
-            // from chronos' SmoothLife shader https://www.shadertoy.com/view/XtdSDn
-            float dst = length(fragCoord.xy - mouse.xy * RENDERSIZE);
-            if (dst <= or) {
-            	new = step((ir + 1.5), dst) * (1. - step(or, dst));
-            }
+            addCell(new, mouse.xy);
         }
 
+        // For unclear reasons, iFrame must be strictly less than 2, not 1,
+        // here.
         if (iFrame < 2 || addCells) {
 #ifdef VIDEOSYNC
             float initialCellCount = min(iResolution.x, iResolution.y) / 50.;
@@ -222,10 +229,7 @@ void main()
                 float angle = 6.2831853072 * // 2 pi
                               i / initialCellCount;
                	vec2 initialCoordinate = 0.25 * vec2(cos(angle), sin(angle)) + 0.5;
-                float dst = length(fragCoord.xy - initialCoordinate * RENDERSIZE);
-                if (dst <= or) {
-                   	new = step((ir + 1.5), dst) * (1. - step(or, dst));
-                }
+                addCell(new, initialCoordinate);
             }
         }
 
