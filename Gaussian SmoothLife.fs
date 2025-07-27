@@ -184,19 +184,6 @@ void main()
         vec2 tx = 1.0 / iResolution.xy;
         vec2 uv = fragCoord.xy * tx;
 
-        const float _K0 = -20.0/6.0; // center weight
-        const float _K1 = 4.0/6.0;   // edge-neighbors
-        const float _K2 = 1.0/6.0;   // vertex-neighbors
-
-        // We can optionally add a laplacian to the update rule
-    	// to decrease the appearance of aliasing, but we also
-    	// introduce subtle anisotropy by doing so.
-        // vec4 t = vec4(tx, -tx.y, 0.0);
-        // float u =    T( t.ww); float u_n =  T( t.wy); float u_e =  T( t.xw);
-        // float u_s =  T( t.wz); float u_w =  T(-t.xw); float u_nw = T(-t.xz);
-        // float u_sw = T(-t.xy); float u_ne = T( t.xy); float u_se = T( t.xz);
-        // float lapl  = _K0*u + _K1*(u_n + u_e + u_w + u_s) + _K2*(u_nw + u_sw + u_ne + u_se);
-
         vec4 current = IMG_NORM_PIXEL(bufferA, uv);
         vec2 fullness = IMG_NORM_PIXEL(bufferC, uv).xy;
 
