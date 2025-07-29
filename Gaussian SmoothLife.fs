@@ -205,7 +205,7 @@ void main()
         vec4 current = IMG_NORM_PIXEL(bufferA, uv);
         vec2 fullness = IMG_NORM_PIXEL(bufferC, uv).xy;
 
-        float delta =  2. * s(fullness.x, fullness.y) - 1.;
+        float delta = 2. * s(fullness.x, fullness.y) - 1.;
         float new = clamp(current.x + dt * delta, 0., 1.);
 
         if (addCellsWithMouse) {
