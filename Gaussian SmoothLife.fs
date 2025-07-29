@@ -99,17 +99,17 @@
     "ISFVSN": "2",
     "PASSES": [
         {
-            "TARGET": "bufferA",
+            "TARGET": "cells",
             "PERSISTENT": true,
             "FLOAT": true
         },
         {
-            "TARGET": "bufferB",
+            "TARGET": "summation1",
             "PERSISTENT": true,
             "FLOAT": true
         },
         {
-            "TARGET": "bufferC",
+            "TARGET": "summation2",
             "PERSISTENT": true,
             "FLOAT": true
         },
@@ -202,8 +202,8 @@ void main()
 
     if (PASSINDEX == 0) // ShaderToy Buffer A
     {
-        vec4 current = IMG_NORM_PIXEL(bufferA, uv);
-        vec2 fullness = IMG_NORM_PIXEL(bufferC, uv).xy;
+        vec4 current = IMG_NORM_PIXEL(cells, uv);
+        vec2 fullness = IMG_NORM_PIXEL(summation2, uv).xy;
 
         float delta = 2. * s(fullness.x, fullness.y) - 1.;
         float new = clamp(current.x + dt * delta, 0., 1.);
@@ -243,12 +243,12 @@ void main()
         // Incredibly, GLSL and ISF have so many limitations that avoiding code
         // duplication for the Gaussian summation seems to be impossible. The
         // only things that vary between the two summations are the image name
-        // (bufferA vs. bufferB) and the component access in the for-loops
+        // (cells vs. summation1) and the component access in the for-loops
         // (x vs. xy), but there doesn’t seem to be a way to encapsulate this in
         // GLSL.
 
         // centermost term
-        gaussianSummation.acc += gaussianSummation.a * IMG_NORM_PIXEL(bufferA, uv).x;
+        gaussianSummation.acc += gaussianSummation.a * IMG_NORM_PIXEL(cells, uv).x;
         gaussianSummation.sum += gaussianSummation.a;
 
         // sum up remaining terms symmetrically
@@ -257,7 +257,7 @@ void main()
             vec2 g = GaussianSummation_computeGaussian(gaussianSummation, fi);
             vec2 posL = fract(uv - tx * fi);
             vec2 posR = fract(uv + tx * fi);
-            gaussianSummation.acc += g * (IMG_NORM_PIXEL(bufferA, posL).x + IMG_NORM_PIXEL(bufferA, posR).x);
+            gaussianSummation.acc += g * (IMG_NORM_PIXEL(cells, posL).x + IMG_NORM_PIXEL(cells, posR).x);
             gaussianSummation.sum += 2. * g;
         }
 
@@ -276,7 +276,7 @@ void main()
         GaussianSummation gaussianSummation = GaussianSummation_create(or, ir);
 
         // centermost term
-        gaussianSummation.acc += gaussianSummation.a * IMG_NORM_PIXEL(bufferB, uv).x;
+        gaussianSummation.acc += gaussianSummation.a * IMG_NORM_PIXEL(summation1, uv).x;
         gaussianSummation.sum += gaussianSummation.a;
 
         // sum up remaining terms symmetrically
@@ -285,7 +285,7 @@ void main()
             vec2 g = GaussianSummation_computeGaussian(gaussianSummation, fi);
             vec2 posL = fract(uv - tx * fi);
             vec2 posR = fract(uv + tx * fi);
-            gaussianSummation.acc += g * (IMG_NORM_PIXEL(bufferB, posL).xy + IMG_NORM_PIXEL(bufferB, posR).xy);
+            gaussianSummation.acc += g * (IMG_NORM_PIXEL(summation1, posL).xy + IMG_NORM_PIXEL(summation1, posR).xy);
             gaussianSummation.sum += 2. * g;
         }
 
@@ -295,8 +295,8 @@ void main()
     }
     else if (PASSINDEX == 3) // ShaderToy Image
     {
-    	vec4 col = IMG_NORM_PIXEL(bufferA, uv);
+    	vec4 color = IMG_NORM_PIXEL(cells, uv);
 
-        gl_FragColor = vec4(col.x * vec3(1.) + col.y * vec3(1., 0.5, 0.) + col.z * vec3(0., 0.5, 1.), 1.);
+        gl_FragColor = vec4(color.x * vec3(1.) + color.y * vec3(1., 0.5, 0.) + color.z * vec3(0., 0.5, 1.), 1.);
     }
 }
