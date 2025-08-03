@@ -293,7 +293,7 @@ void main()
 
         gl_FragColor = vec4(y_pass, 0., 0.);
     }
-    else if (PASSINDEX == 3) // ShaderToy Image
+    else // ShaderToy Image
     {
     	vec4 color = IMG_NORM_PIXEL(cells, uv);
 
