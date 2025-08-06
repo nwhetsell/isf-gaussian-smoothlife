@@ -120,6 +120,15 @@
 }
 */
 
+#define SQRT_TWO_PI 2.5066282746310005024157652848110
+
+// Constants and functions from LYGIA <https://github.com/patriciogonzalezvivo/lygia>
+#define TWO_PI 6.2831853071795864769252867665590
+
+vec2 polar2cart(in vec2 polar) {
+    return vec2(cos(polar.x), sin(polar.x)) * polar.y;
+}
+
 //
 // ShaderToy Buffer A
 //
@@ -173,10 +182,10 @@ GaussianSummation GaussianSummation_create(float or, float ir)
     vec2 sigma = vec2(or, ir);
 
     GaussianSummation gaussianSummation;
-    gaussianSummation.a = vec2(1. / (sigma * 2.50662827463)); // sqrt(2 * pi)
+    gaussianSummation.a = vec2(1. / (sigma * SQRT_TWO_PI));
     gaussianSummation.d = vec2(2. * sigma * sigma);
-    gaussianSummation.acc = vec2(0.);
-    gaussianSummation.sum = vec2(0.);
+    gaussianSummation.acc = vec2(0);
+    gaussianSummation.sum = vec2(0);
     return gaussianSummation;
 }
 
@@ -221,9 +230,7 @@ void main()
             const float initialCellCount = 20.;
 #endif
             for (float i = 0.; i < initialCellCount; i++) {
-                float angle = 6.2831853072 * // 2 pi
-                              i / initialCellCount;
-               	vec2 initialCoordinate = 0.25 * vec2(cos(angle), sin(angle)) + 0.5;
+               	vec2 initialCoordinate = polar2cart(vec2(TWO_PI * i / initialCellCount, 0.25)) + 0.5;
                 addCell(new, initialCoordinate);
             }
         }
@@ -263,7 +270,7 @@ void main()
 
         vec2 x_pass = gaussianSummation.acc / gaussianSummation.sum;
 
-        gl_FragColor = vec4(x_pass, 0., 0.);
+        gl_FragColor = vec4(x_pass, 0, 0);
     }
     else if (PASSINDEX == 2) // ShaderToy Buffer C
     {
@@ -291,12 +298,12 @@ void main()
 
         vec2 y_pass = gaussianSummation.acc / gaussianSummation.sum;
 
-        gl_FragColor = vec4(y_pass, 0., 0.);
+        gl_FragColor = vec4(y_pass, 0, 0);
     }
     else // ShaderToy Image
     {
     	vec4 color = IMG_NORM_PIXEL(cells, uv);
 
-        gl_FragColor = vec4(color.x * vec3(1.) + color.y * vec3(1., 0.5, 0.) + color.z * vec3(0., 0.5, 1.), 1.);
+        gl_FragColor = vec4(color.x * vec3(1) + color.y * vec3(1, 0.5, 0) + color.z * vec3(0, 0.5, 1), 1);
     }
 }
