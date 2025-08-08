@@ -136,7 +136,7 @@ vec2 polar2cart(in vec2 polar) {
 // the logistic function is used as a smooth step function
 float sigma1(float x, float a, float alpha)
 {
-    return 1. / (1. + exp(-(x-a) * 4. / alpha));
+    return 1. / (1. + exp(-(x - a) * 4. / alpha));
 }
 
 float sigma2(float x, float a, float b, float alpha)
@@ -186,6 +186,7 @@ GaussianSummation GaussianSummation_create(float or, float ir)
     gaussianSummation.d = vec2(2. * sigma * sigma);
     gaussianSummation.acc = vec2(0);
     gaussianSummation.sum = vec2(0);
+
     return gaussianSummation;
 }
 
@@ -304,6 +305,6 @@ void main()
     {
     	vec4 color = IMG_NORM_PIXEL(cells, uv);
 
-        gl_FragColor = vec4(color.x * vec3(1) + color.y * vec3(1, 0.5, 0) + color.z * vec3(0, 0.5, 1), 1);
+        gl_FragColor = vec4(color.r * vec3(1) + color.g * vec3(1, 0.5, 0) + color.b * vec3(0, 0.5, 1), 1);
     }
 }
