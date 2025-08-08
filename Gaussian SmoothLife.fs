@@ -270,7 +270,7 @@ void main()
 
         vec2 x_pass = gaussianSummation.acc / gaussianSummation.sum;
 
-        gl_FragColor = vec4(x_pass, 0, 0);
+        gl_FragColor = vec4(x_pass, 0, 1);
     }
     else if (PASSINDEX == 2) // ShaderToy Buffer C
     {
@@ -298,7 +298,7 @@ void main()
 
         vec2 y_pass = gaussianSummation.acc / gaussianSummation.sum;
 
-        gl_FragColor = vec4(y_pass, 0, 0);
+        gl_FragColor = vec4(y_pass, 0, 1);
     }
     else // ShaderToy Image
     {
