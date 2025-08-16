@@ -1,10 +1,23 @@
 /*{
     "CATEGORIES": [
+        "Filter",
         "Generator"
     ],
     "CREDIT": "cornusammonis <https://www.shadertoy.com/user/cornusammonis>",
     "DESCRIPTION": "Variant of Stephan Rafler’s SmoothLife that uses a separable Gaussian kernel to compute inner and outer fullness, converted from <https://www.shadertoy.com/view/XtVXzV>",
     "INPUTS": [
+        {
+            "NAME" : "inputImage",
+            "TYPE" : "image"
+        },
+        {
+            "NAME": "inputImageAmount",
+            "LABEL": "Input image amount",
+            "TYPE": "float",
+            "DEFAULT": 0,
+            "MIN": 0,
+            "MAX": 1
+        },
         {
             "NAME": "addCells",
             "LABEL": "Add cells",
@@ -213,9 +226,11 @@ void main()
     if (PASSINDEX == 0) // ShaderToy Buffer A
     {
         vec4 current = IMG_NORM_PIXEL(cells, uv);
-        vec2 fullness = IMG_NORM_PIXEL(summation2, uv).xy;
+        current += inputImageAmount * IMG_NORM_PIXEL(inputImage, uv);
 
+        vec2 fullness = IMG_NORM_PIXEL(summation2, uv).xy;
         float delta = 2. * s(fullness.x, fullness.y) - 1.;
+
         float new = clamp(current.x + dt * delta, 0., 1.);
 
         if (addCellsWithMouse) {
