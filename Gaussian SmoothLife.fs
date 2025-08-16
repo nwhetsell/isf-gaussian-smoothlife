@@ -147,31 +147,39 @@ vec2 polar2cart(in vec2 polar) {
 //
 
 // the logistic function is used as a smooth step function
-float sigma1(float x, float a, float alpha)
+float logistic(float x, float midpoint, float quarterInverseSteepness)
 {
-    return 1. / (1. + exp(-(x - a) * 4. / alpha));
+    float steepness = 4. / quarterInverseSteepness;
+    return 1. / (1. + exp(-steepness * (x - midpoint)));
 }
 
-float sigma2(float x, float a, float b, float alpha)
+float logisticPulse(float x, float midpoint1, float midpoint2, float quarterInverseSteepness)
 {
-    return sigma1(x, a, alpha) * (1. - sigma1(x, b, alpha));
+    // In general, midpoint1 should be less than midpoint2.
+    return logistic(x, midpoint1, quarterInverseSteepness) * (1. - logistic(x, midpoint2, quarterInverseSteepness));
 }
 
-float sigma_m(float x, float y, float m, float alpha)
+float transformedLogistic(float x, float yShift, float maxValue, float quarterInverseSteepness)
 {
-    return x * (1. - sigma1(m, 0.5, alpha)) + y * sigma1(m, 0.5, alpha);
-}
-
-// the transition function
-// (n = outer fullness, m = inner fullness)
-float s(float n, float m)
-{
-    return sigma2(
-        n,
-        sigma_m(b1, s1, m, alpha_m),
-        sigma_m(b2, s2, m, alpha_m),
-        alpha_n
-    );
+    // The original ShaderToy shader effectively uses:
+    //    return yShift * (1. - logistic(x, 0.5, quarterInverseSteepness)) + maxValue * logistic(x, 0.5, quarterInverseSteepness);
+    // Simplifying this shows that this isn’t really two logistic functions.
+    // It’s actually one logistic function shifted vertically by yShift with a
+    // maximum value of maxValue:
+    //
+    //          ╭              1          ╮                       1
+    // yShift × │ 1 - ------------------- │ + maxValue × -------------------
+    //          ╰     1 + exp(-(x - 0.5)) ╯              1 + exp(-(x - 0.5))
+    //
+    //
+    //                yShift                maxValue
+    // yShift - ------------------- + -------------------
+    //          1 + exp(-(x - 0.5))   1 + exp(-(x - 0.5))
+    //
+    //           maxValue - yShift
+    // yShift + -------------------
+    //          1 + exp(-(x - 0.5))
+    return yShift + (maxValue - yShift) * logistic(x, 0.5, quarterInverseSteepness);
 }
 
 
@@ -229,7 +237,11 @@ void main()
         current += inputImageAmount * IMG_NORM_PIXEL(inputImage, uv);
 
         vec2 fullness = IMG_NORM_PIXEL(summation2, uv).xy;
-        float delta = 2. * s(fullness.x, fullness.y) - 1.;
+        float outerFullness = fullness.x;
+        float innerFullness = fullness.y;
+        float midpoint1 = transformedLogistic(innerFullness, b1, s1, alpha_m);
+        float midpoint2 = transformedLogistic(innerFullness, b2, s2, alpha_m);
+        float delta = 2. * logisticPulse(outerFullness, midpoint1, midpoint2, alpha_n) - 1.;
 
         float new = clamp(current.x + dt * delta, 0., 1.);
 
