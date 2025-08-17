@@ -171,7 +171,6 @@ float transformedLogistic(float x, float yShift, float maxValue, float quarterIn
     // yShift × │ 1 - ------------------- │ + maxValue × -------------------
     //          ╰     1 + exp(-(x - 0.5)) ╯              1 + exp(-(x - 0.5))
     //
-    //
     //                yShift                maxValue
     // yShift - ------------------- + -------------------
     //          1 + exp(-(x - 0.5))   1 + exp(-(x - 0.5))
