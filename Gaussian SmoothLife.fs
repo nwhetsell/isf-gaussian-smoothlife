@@ -217,10 +217,10 @@ vec2 GaussianSummation_computeGaussian(GaussianSummation gaussianSummation, floa
 }
 
 
-void addCell(inout float new, vec2 nomralizedCoordinate)
+void addCell(inout float new, vec2 normalizedCoordinate)
 {
     // from chronos' SmoothLife shader https://www.shadertoy.com/view/XtdSDn
-    float dst = length(gl_FragCoord.xy - nomralizedCoordinate * RENDERSIZE);
+    float dst = length(gl_FragCoord.xy - normalizedCoordinate * RENDERSIZE);
     if (dst <= or) {
     	new = step((ir + 1.5), dst) * (1. - step(or, dst));
     }
