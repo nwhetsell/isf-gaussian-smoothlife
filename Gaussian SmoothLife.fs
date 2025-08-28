@@ -264,25 +264,30 @@ void main()
 
         gl_FragColor = vec4(new, fullness, current.w);
     }
-    else if (PASSINDEX == 1) // ShaderToy Buffer B
+    else if (PASSINDEX == 1 || PASSINDEX == 2) // ShaderToy Buffer B and C
     {
-        if (mod(float(FRAMEINDEX), 2.) < 1.) {
-            tx.y = 0.;
+        if (PASSINDEX == 1) {
+            if (mod(float(FRAMEINDEX), 2.) < 1.) {
+                tx.y = 0.;
+            } else {
+                tx.x = 0.;
+            }
         } else {
-            tx.x = 0.;
+            if (mod(float(FRAMEINDEX), 2.) < 1.) {
+                tx.x = 0.;
+            } else {
+                tx.y = 0.;
+            }
         }
 
         GaussianSummation gaussianSummation = GaussianSummation_create(or, ir);
 
-        // Incredibly, GLSL and ISF have so many limitations that avoiding code
-        // duplication for the Gaussian summation seems to be impossible. The
-        // only things that vary between the two summations are the image name
-        // (cells vs. summation1) and the component access in the for-loops
-        // (x vs. xy), but there doesn’t seem to be a way to encapsulate this in
-        // GLSL.
-
         // centermost term
-        gaussianSummation.acc += gaussianSummation.a * IMG_NORM_PIXEL(cells, uv).x;
+        if (PASSINDEX == 1) {
+            gaussianSummation.acc += gaussianSummation.a * IMG_NORM_PIXEL(cells, uv).x;
+        } else {
+            gaussianSummation.acc += gaussianSummation.a * IMG_NORM_PIXEL(summation1, uv).x;
+        }
         gaussianSummation.sum += gaussianSummation.a;
 
         // sum up remaining terms symmetrically
@@ -291,41 +296,17 @@ void main()
             vec2 g = GaussianSummation_computeGaussian(gaussianSummation, fi);
             vec2 posL = fract(uv - tx * fi);
             vec2 posR = fract(uv + tx * fi);
-            gaussianSummation.acc += g * (IMG_NORM_PIXEL(cells, posL).x + IMG_NORM_PIXEL(cells, posR).x);
+            if (PASSINDEX == 1) {
+                gaussianSummation.acc += g * (IMG_NORM_PIXEL(cells, posL).x + IMG_NORM_PIXEL(cells, posR).x);
+            } else {
+                gaussianSummation.acc += g * (IMG_NORM_PIXEL(summation1, posL).xy + IMG_NORM_PIXEL(summation1, posR).xy);
+            }
             gaussianSummation.sum += 2. * g;
         }
 
-        vec2 x_pass = gaussianSummation.acc / gaussianSummation.sum;
+        vec2 pass = gaussianSummation.acc / gaussianSummation.sum;
 
-        gl_FragColor = vec4(x_pass, 0, 1);
-    }
-    else if (PASSINDEX == 2) // ShaderToy Buffer C
-    {
-        if (mod(float(FRAMEINDEX), 2.) < 1.) {
-            tx.x = 0.;
-        } else {
-            tx.y = 0.;
-        }
-
-        GaussianSummation gaussianSummation = GaussianSummation_create(or, ir);
-
-        // centermost term
-        gaussianSummation.acc += gaussianSummation.a * IMG_NORM_PIXEL(summation1, uv).x;
-        gaussianSummation.sum += gaussianSummation.a;
-
-        // sum up remaining terms symmetrically
-        for (int i = 1; i <= oc; i++) {
-            float fi = float(i);
-            vec2 g = GaussianSummation_computeGaussian(gaussianSummation, fi);
-            vec2 posL = fract(uv - tx * fi);
-            vec2 posR = fract(uv + tx * fi);
-            gaussianSummation.acc += g * (IMG_NORM_PIXEL(summation1, posL).xy + IMG_NORM_PIXEL(summation1, posR).xy);
-            gaussianSummation.sum += 2. * g;
-        }
-
-        vec2 y_pass = gaussianSummation.acc / gaussianSummation.sum;
-
-        gl_FragColor = vec4(y_pass, 0, 1);
+        gl_FragColor = vec4(pass, 0, 1);
     }
     else // ShaderToy Image
     {
