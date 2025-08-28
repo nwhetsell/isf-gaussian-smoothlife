@@ -248,9 +248,9 @@ void main()
             addCell(new, mouse.xy);
         }
 
-        // For unclear reasons, FRAMEINDEX must be strictly less than 2, not 1,
+        // For unclear reasons, FRAMEINDEX must be strictly less than 5, not 1,
         // here.
-        if (FRAMEINDEX < 2 || addCells) {
+        if (FRAMEINDEX < 5 || addCells) {
 #ifdef VIDEOSYNC
             float initialCellCount = min(RENDERSIZE.x, RENDERSIZE.y) / 50.;
 #else
