@@ -53,6 +53,14 @@
             "MIN": 0
         },
         {
+            "NAME": "oc",
+            "LABEL": "Sample cutoff",
+            "TYPE": "float",
+            "DEFAULT": 50,
+            "MAX": 100,
+            "MIN": 1
+        },
+        {
             "NAME": "b1",
             "LABEL": "Birth 1",
             "TYPE": "float",
@@ -186,10 +194,6 @@ float transformedLogistic(float x, float yShift, float maxValue, float quarterIn
 // ShaderToy Buffer B
 //
 
-// ---------------------------------------------
-const int   oc = 50;           // sample cutoff
-// ---------------------------------------------
-
 struct GaussianSummation {
     vec2 a;
     vec2 d;
@@ -291,6 +295,9 @@ void main()
         gaussianSummation.sum += gaussianSummation.a;
 
         // sum up remaining terms symmetrically
+#ifndef VIDEOSYNC
+        const int oc = 50;
+#endif
         for (int i = 1; i <= oc; i++) {
             float fi = float(i);
             vec2 g = GaussianSummation_computeGaussian(gaussianSummation, fi);
